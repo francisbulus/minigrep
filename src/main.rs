@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 // use std::os::unix::process;
 use std::process;
+use std::error::Error;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -10,11 +11,6 @@ fn main() {
         println!("Problem parsing the arguments: {}", err);
         process::exit(1);
     });
-    let mut f = File::open(config.filename).expect("file not found.");
-    let mut contents = String::new();
-    f.read_to_string(&mut contents)
-        .expect("something went wrong reading the file");
-    println!("With text:\n{}", contents);
 }
 
 struct Config {
@@ -31,4 +27,12 @@ impl Config {
         let filename = args[2].clone();
         Ok(Config { query, filename })
     }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    let mut f = File::open(config.filename)?;
+    let mut contents = String::new();
+    f.read_to_string(&mut contents)?;
+    println!("With text:\n{}", contents);
+    Ok(())
 }
